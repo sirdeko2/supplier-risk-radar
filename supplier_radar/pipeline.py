@@ -115,22 +115,56 @@ def _build_model(con, as_of: str) -> None:
 _BAND_ORDER = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
 
 
+WAREHOUSE_TABLES = ("dim_supplier", "dim_vulnerability", "bridge_supplier_product", "fact_exposure")
+
+
+def _materialize(con, suppliers, products, kev, as_of) -> None:
+    """Build the whole star schema in the given connection."""
+    _build_schema(con)
+    _load_raw(con, suppliers, products, kev)
+    _build_model(con, as_of)
+
+
+def _collect(con, suppliers, kev, kev_source, as_of) -> RunResult:
+    cols = [c[0] for c in con.execute("SELECT * FROM fact_exposure LIMIT 0").description]
+    findings = [dict(zip(cols, row)) for row in con.execute("SELECT * FROM fact_exposure").fetchall()]
+    for f in findings:
+        f["due_date"] = str(f["due_date"]) if f["due_date"] is not None else None
+        f["source"] = "CISA KEV"
+        f["as_of"] = as_of
+    exposed = {f["supplier_id"] for f in findings}
+    return RunResult(findings, len(suppliers), len(exposed), as_of, kev_source, len(kev))
+
+
 def run(suppliers: list[dict], products: list[dict], kev: list[dict],
         kev_source: str, as_of: str | None = None) -> RunResult:
     """Run the whole pipeline in memory and return the findings."""
     as_of = as_of or date.today().isoformat()
     con = duckdb.connect(":memory:")
     try:
-        _build_schema(con)
-        _load_raw(con, suppliers, products, kev)
-        _build_model(con, as_of)
-        cols = [c[0] for c in con.execute("SELECT * FROM fact_exposure LIMIT 0").description]
-        findings = [dict(zip(cols, row)) for row in con.execute("SELECT * FROM fact_exposure").fetchall()]
-        for f in findings:
-            f["due_date"] = str(f["due_date"]) if f["due_date"] is not None else None
-            f["source"] = "CISA KEV"
-            f["as_of"] = as_of
-        exposed = {f["supplier_id"] for f in findings}
-        return RunResult(findings, len(suppliers), len(exposed), as_of, kev_source, len(kev))
+        _materialize(con, suppliers, products, kev, as_of)
+        return _collect(con, suppliers, kev, kev_source, as_of)
+    finally:
+        con.close()
+
+
+def export_warehouse(suppliers: list[dict], products: list[dict], kev: list[dict],
+                     kev_source: str, out_dir: str, as_of: str | None = None) -> RunResult:
+    """Build the model and write every dimension and the fact table to Parquet.
+
+    This is what the AWS deployment calls: the Parquet files land in S3 and
+    Athena queries them directly, so the same star schema that runs locally
+    becomes a queryable warehouse with no code change.
+    """
+    import os
+    as_of = as_of or date.today().isoformat()
+    os.makedirs(out_dir, exist_ok=True)
+    con = duckdb.connect(":memory:")
+    try:
+        _materialize(con, suppliers, products, kev, as_of)
+        for table in WAREHOUSE_TABLES:
+            dest = os.path.join(out_dir, f"{table}.parquet").replace("'", "''")
+            con.execute(f"COPY {table} TO '{dest}' (FORMAT PARQUET)")
+        return _collect(con, suppliers, kev, kev_source, as_of)
     finally:
         con.close()

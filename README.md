@@ -87,7 +87,8 @@ python -m pytest tests/ -q      # 14 tests: contracts, matching, confidence, sco
 
 - [x] Local pipeline: live KEV fetch, dimensional model, scoring, HTML + JSON report
 - [x] Data contracts and a test suite
-- [ ] Deploy on AWS: KEV + inventory in S3, pipeline on Lambda, queried with Athena
+- [x] Deploy on AWS: inventory + Parquet warehouse in S3, pipeline on Lambda,
+      queried with Athena — see [`aws/README.md`](aws/README.md)
 - [ ] AI-assisted evidence extraction: read a supplier's security questionnaire,
       pull control evidence with citations and a human-review step
 
@@ -103,6 +104,7 @@ supplier_radar/
 data/            real sample KEV + a synthetic supplier inventory
 tests/           pytest suite
 docs/            data model and scoring methodology
+aws/             Lambda handler, Athena DDL, deploy script (S3 + Lambda + Athena)
 ```
 
 The supplier inventory in `data/` is synthetic and illustrative. The KEV data is real.
