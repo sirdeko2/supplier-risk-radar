@@ -1,0 +1,13 @@
+supplier_id,supplier_name,tier,category,data_access,internet_facing
+SUP001,Northwind Payments,Critical,Payment processing,Financial,yes
+SUP002,Lakeside Health Records,Critical,Health records,PHI,yes
+SUP003,Meridian Cloud Infra,High,Cloud hosting,PII,yes
+SUP004,Atlas HR Systems,High,HR and payroll,PII,yes
+SUP005,Quill Analytics,Medium,Business analytics,None,no
+SUP006,Beacon VPN Services,High,Remote access,PII,yes
+SUP007,Cedar Office Suite,Low,Office productivity,None,no
+SUP008,Riverside Logistics,Medium,Logistics,None,no
+SUP009,Summit Comms,Medium,Unified communications,PII,yes
+SUP010,Pine Identity,Critical,Identity provider,Credentials,yes
+SUP011,Harbor Backup,High,Backup and recovery,Financial,yes
+SUP012,Delta Marketing,Low,Marketing,None,no

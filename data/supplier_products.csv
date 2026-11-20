@@ -1,0 +1,24 @@
+supplier_id,vendor,product
+SUP001,Progress,MOVEit Transfer
+SUP001,Citrix,NetScaler Gateway
+SUP001,Microsoft,Windows
+SUP002,Microsoft,Exchange Server
+SUP002,Atlassian,Confluence Server and Data Center
+SUP002,Apache,Log4j2
+SUP003,VMware,vCenter Server
+SUP003,Fortinet,FortiOS
+SUP003,Cisco,IOS XE
+SUP004,Atlassian,Confluence Server and Data Center
+SUP004,Microsoft,Windows
+SUP005,Apache,Log4j2
+SUP005,VMware,Spring Framework
+SUP006,Ivanti,Connect Secure
+SUP006,Palo Alto Networks,PAN-OS
+SUP006,Fortinet,FortiOS
+SUP007,Microsoft,Office 365
+SUP008,SAP,NetWeaver
+SUP009,Cisco,Expressway Series
+SUP009,Apache,Roller
+SUP010,Okta,Workforce Identity Cloud
+SUP011,Progress,MOVEit Transfer
+SUP012,Adobe,ColdFusion

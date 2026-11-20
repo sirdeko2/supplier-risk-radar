@@ -1,0 +1,12 @@
+[project]
+name = "supplier-risk-radar"
+version = "0.1.0"
+description = "Match your suppliers against the CISA KEV catalog and score exposure, with traceability and data-quality checks."
+requires-python = ">=3.10"
+dependencies = ["duckdb>=1.0"]
+
+[project.scripts]
+radar = "supplier_radar.cli:main"
+
+[tool.setuptools]
+packages = ["supplier_radar"]
